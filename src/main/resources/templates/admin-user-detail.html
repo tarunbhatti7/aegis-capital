@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Capital - User Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-luxe">
+        <div class="container">
+            <a class="navbar-brand" href="#">AEGIS <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">ADMIN</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border-color: var(--gold);">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/admin/users}">Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin/transactions}">All Transactions</a></li>
+
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><span class="nav-link user-badge"><span style="display: inline-block; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; margin-right: 8px;"></span><strong>Administrator</strong></span></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <a th:href="@{/admin/users}" class="btn btn-luxe-outline btn-luxe-sm mb-3">&larr; Back to Users</a>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card-luxe animate-slide-up">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">User Information</h5>
+                        <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm"
+                                    th:classappend="${user.enabled} ? 'btn-luxe-danger' : 'btn-luxe-success'"
+                                    th:onclick="'return confirm(\'' + (${user.enabled} ? 'Disable this user? They will not be able to login or perform transactions.' : 'Enable this user? They will regain access.') + '\');'">
+                                <span th:text="${user.enabled} ? '&#10005; Disable User' : '&#10003; Enable User'"></span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="avatar-luxe mx-auto">
+                                <span th:text="${#strings.substring(user.fullName, 0, 1)}">U</span>
+                            </div>
+                        </div>
+                        <table class="table" style="border-collapse: collapse;">
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">ID</td>
+                                <td style="padding: 0.75rem 0; border: none;" th:text="${user.id}">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Username</td>
+                                <td style="padding: 0.75rem 0; border: none;" th:text="${user.username}">user</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Name</td>
+                                <td style="padding: 0.75rem 0; border: none;" th:text="${user.fullName}">Name</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Email</td>
+                                <td style="padding: 0.75rem 0; border: none;" th:text="${user.email}">email</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Phone</td>
+                                <td style="padding: 0.75rem 0; border: none;" th:text="${user.phone}">phone</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Role</td>
+                                <td style="padding: 0.75rem 0; border: none;"><span class="badge badge-luxe bg-info" th:text="${#strings.replace(user.role, 'ROLE_', '')}">Role</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--navy); padding: 0.75rem 0; border: none;">Status</td>
+                                <td style="padding: 0.75rem 0; border: none;">
+                                    <span th:if="${user.enabled}" style="color: #2ecc71; font-weight: 600;">&#9679; Active</span>
+                                    <span th:unless="${user.enabled}" style="color: #e74c3c; font-weight: 600;">&#9679; Disabled</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="color: var(--gray-400); font-size: 0.8rem; margin-top: 1rem;">Member since <span th:text="${#temporals.format(user.createdAt, 'MMMM dd, yyyy')}">Date</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 mb-4">
+                <div class="card-luxe animate-slide-up stagger-1">
+                    <div class="card-header">
+                        <h5 class="mb-0">Accounts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(accounts)}" class="empty-state">
+                            <p style="color: var(--gray-400);">No accounts for this user.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(accounts)}">
+                            <div class="table-responsive">
+                                <table class="table table-luxe">
+                                    <thead>
+                                        <tr>
+                                            <th>Account Number</th>
+                                            <th>Balance</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="acc : ${accounts}">
+                                            <td style="font-family: 'Courier New', monospace; letter-spacing: 1.5px; font-size: 0.9rem;" th:text="${acc.accountNumber}">AEG</td>
+                                            <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(acc.balance, 1, 2)}" style="font-weight: 700;">$0</td>
+                                            <td>
+                                                <span th:if="${acc.active}" style="color: #2ecc71; font-weight: 600;">&#9679; Active</span>
+                                                <span th:unless="${acc.active}" class="text-secondary">&#9679; Inactive</span>
+                                            </td>
+                                            <td style="color: var(--gray-400); font-size: 0.85rem;" th:text="${#temporals.format(acc.createdAt, 'MMM dd, yyyy')}">Date</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-luxe mt-4 animate-slide-up stagger-2">
+                    <div class="card-header">
+                        <h5 class="mb-0">Transaction History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(transactions)}" class="empty-state">
+                            <p style="color: var(--gray-400);">No transactions found.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(transactions)}">
+                            <div class="table-responsive">
+                                <table class="table table-luxe">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="txn : ${transactions}">
+                                            <td style="color: var(--gray-400); font-size: 0.85rem; white-space: nowrap;" th:text="${#temporals.format(txn.timestamp, 'MMM dd, HH:mm')}">Date</td>
+                                            <td><span class="badge badge-luxe bg-info" th:text="${txn.transactionType}">Type</span></td>
+                                            <td>
+                                                <span th:class="${txn.transactionType.name() == 'DEPOSIT' or (txn.transactionType.name() == 'TRANSFER' and txn.toAccount != null and userAccountNumbers.contains(txn.toAccount.accountNumber))} ? 'txn-credit' : 'txn-debit'"
+                                                      th:text="(${txn.transactionType.name() == 'DEPOSIT' or (txn.transactionType.name() == 'TRANSFER' and txn.toAccount != null and userAccountNumbers.contains(txn.toAccount.accountNumber))} ? '+' : '-') + '$' + ${#numbers.formatDecimal(txn.amount, 1, 2)}">$0</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-luxe" th:classappend="${txn.status.name() == 'SUCCESS'} ? 'bg-success' : 'bg-danger'" th:text="${txn.status}">Status</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-luxe text-center mt-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Aegis Capital. All rights reserved.</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

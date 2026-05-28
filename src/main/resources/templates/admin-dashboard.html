@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Capital - Admin Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-luxe">
+        <div class="container">
+            <a class="navbar-brand" href="#">AEGIS <span style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">ADMIN</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border-color: var(--gold);">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/admin/dashboard}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin/users}">Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin/transactions}">All Transactions</a></li>
+
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><span class="nav-link user-badge"><span style="display: inline-block; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; margin-right: 8px;"></span><strong th:text="${admin.fullName}">Administrator</strong></span></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h4 class="page-header animate-slide-up">Admin Dashboard</h4>
+
+        <div class="welcome-luxe animate-slide-up">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <p class="mb-1" style="color: var(--gold-light); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Administrator Console</p>
+                    <h2><span th:text="${admin.fullName}">Admin</span></h2>
+                    <div class="d-flex flex-wrap gap-3 mt-2">
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                            <span style="color: var(--gold);">&#9679;</span>
+                            <span th:text="${admin.email}">admin@aegis.com</span>
+                        </span>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                            <span style="color: var(--gold);">&#9679;</span>
+                            <span th:text="${admin.phone}">+1-555-0000</span>
+                        </span>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                            <span style="color: var(--gold);">&#9679;</span>
+                            Staff since <span th:text="${#temporals.format(admin.createdAt, 'MMM yyyy')}">Date</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <span class="welcome-icon">&#9733;</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4 g-3">
+            <div class="col-md-3">
+                <div class="stat-card-luxe stat-card animate-slide-up stagger-1">
+                    <div class="card-body">
+                        <div class="stat-number" th:text="${userCount}">0</div>
+                        <div class="stat-label">Total Users</div>
+                        <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 0.4rem;">
+                            <span style="color: #2ecc71;">&#9679; <span th:text="${activeUsers}">0</span> Active</span>
+                            <span style="color: #e74c3c; margin-left: 0.8rem;">&#9679; <span th:text="${inactiveUsers}">0</span> Inactive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-luxe stat-card-green animate-slide-up stagger-2">
+                    <div class="card-body">
+                        <div class="stat-number" th:text="${transactionCount}">0</div>
+                        <div class="stat-label">Total Transactions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-luxe stat-card-green animate-slide-up stagger-3" style="background: linear-gradient(135deg, #0f4c3a, #1b7a4a);">
+                    <div class="card-body">
+                        <div class="stat-number">$<span th:text="${#numbers.formatDecimal(totalDeposited, 1, 2)}">0</span></div>
+                        <div class="stat-label">Total Deposited</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card-luxe stat-card-orange animate-slide-up stagger-4" style="background: linear-gradient(135deg, #7a1a1a, #c0392b);">
+                    <div class="card-body">
+                        <div class="stat-number">$<span th:text="${#numbers.formatDecimal(totalWithdrawn, 1, 2)}">0</span></div>
+                        <div class="stat-label">Total Withdrawn</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4 g-3">
+            <div class="col-md-4">
+                <div class="stat-card-luxe stat-card-gold animate-slide-up stagger-5">
+                    <div class="card-body">
+                        <div class="stat-number">$<span th:text="${#numbers.formatDecimal(totalTransferred, 1, 2)}">0</span></div>
+                        <div class="stat-label">Total Transferred</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card-luxe stat-card-blue animate-slide-up stagger-6">
+                    <div class="card-body">
+                        <div class="stat-number">$<span th:text="${#numbers.formatDecimal(totalBankBalance, 1, 2)}">0</span></div>
+                        <div class="stat-label">Bank Total Balance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card-luxe stat-card-purple animate-slide-up stagger-6">
+                    <div class="card-body">
+                        <div class="stat-number">&#9670;</div>
+                        <div class="stat-label">System Online</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <a th:href="@{/admin/users}" class="quick-action animate-slide-up stagger-1 h-100" style="text-align: left; display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="action-icon" style="margin: 0; min-width: 56px; background: rgba(212,168,67,0.1); color: var(--gold);">&#128101;</div>
+                    <div>
+                        <h5 style="font-weight: 700;">Manage Users</h5>
+                        <p class="mb-0" style="color: var(--gray-400);">View all registered users — active &amp; inactive</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a th:href="@{/admin/transactions}" class="quick-action animate-slide-up stagger-2 h-100" style="text-align: left; display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="action-icon" style="margin: 0; min-width: 56px; background: rgba(27,138,74,0.1); color: #1b8a4a;">&#128202;</div>
+                    <div>
+                        <h5 style="font-weight: 700;">All Transactions</h5>
+                        <p class="mb-0" style="color: var(--gray-400);">Complete real-time transaction log</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="card-luxe animate-slide-up stagger-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Recent System Transactions</span>
+                <a th:href="@{/admin/transactions}" class="btn btn-sm" style="background: rgba(212,168,67,0.2); color: var(--gold); border-radius: 50px; font-size: 0.75rem;">View All</a>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(recentTransactions)}" class="empty-state">
+                    <div class="empty-icon">&#128202;</div>
+                    <p style="color: var(--gray-400);">No transactions yet.</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(recentTransactions)}">
+                    <div class="table-responsive">
+                        <table class="table table-luxe">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="txn : ${recentTransactions}">
+                                    <td style="color: var(--gray-400); font-size: 0.85rem; white-space: nowrap;" th:text="${#temporals.format(txn.timestamp, 'MMM dd, HH:mm')}">Date</td>
+                                    <td><span class="badge badge-luxe" th:classappend="${txn.transactionType.name() == 'DEPOSIT'} ? 'bg-success' : (${txn.transactionType.name() == 'WITHDRAW'} ? 'bg-danger' : 'bg-warning text-dark')" th:text="${txn.transactionType}">Type</span></td>
+                                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem;" th:text="${txn.fromAccount != null} ? ${txn.fromAccount.accountNumber} : '-'">From</td>
+                                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem;" th:text="${txn.toAccount != null} ? ${txn.toAccount.accountNumber} : '-'">To</td>
+                                    <td>
+                                        <span th:class="${txn.transactionType.name() == 'DEPOSIT'} ? 'txn-credit' : 'txn-debit'"
+                                              th:text="(${txn.transactionType.name() == 'DEPOSIT'} ? '+' : '-') + '$' + ${#numbers.formatDecimal(txn.amount, 1, 2)}">$0</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-luxe" th:classappend="${txn.status.name() == 'SUCCESS'} ? 'bg-success' : 'bg-danger'" th:text="${txn.status}">Status</span>
+                                    </td>
+                                    <td th:text="${txn.initiatedBy}" style="font-size: 0.9rem;">User</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-luxe text-center mt-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Aegis Capital. All rights reserved. | Admin Console</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

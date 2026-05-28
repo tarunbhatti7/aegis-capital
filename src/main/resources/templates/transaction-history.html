@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Capital - Transaction History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-luxe">
+        <div class="container">
+            <a class="navbar-brand" href="#">AEGIS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border-color: var(--gold);">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/accounts}">Accounts</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/deposit}">Deposit</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/withdraw}">Withdraw</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/user/transfer}">Transfer</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/user/transactions}">History</a></li>
+                    <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/dashboard}"><span class="badge" style="background: var(--gold); color: var(--navy);">Admin</span></a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><span class="nav-link user-badge"><span style="display: inline-block; width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-right: 8px;"></span><strong th:text="${user.fullName}">User</strong></span></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h4 class="page-header animate-slide-up">Transaction History</h4>
+        <div class="card-luxe animate-slide-up stagger-1">
+            <div class="card-header">
+                <h5 class="mb-0">Complete Transaction Log</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(transactions)}" class="empty-state">
+                    <div class="empty-icon">&#128202;</div>
+                    <h5 style="color: var(--navy);">No transactions found</h5>
+                    <p style="color: var(--gray-400);">Your transaction history will appear here.</p>
+                    <a th:href="@{/user/deposit}" class="btn btn-luxe-gold mt-2">Make a Deposit</a>
+                </div>
+                <div th:unless="${#lists.isEmpty(transactions)}">
+                    <div class="table-responsive">
+                        <table class="table table-luxe">
+                            <thead>
+                                <tr>
+                                    <th>Date &amp; Time</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="txn : ${transactions}">
+                                    <td style="color: var(--gray-400); font-size: 0.85rem; white-space: nowrap;" th:text="${#temporals.format(txn.timestamp, 'MMM dd, yyyy HH:mm')}">Date</td>
+                                    <td>
+                                        <span class="badge badge-luxe" th:classappend="${txn.transactionType.name() == 'DEPOSIT'} ? 'bg-success' : (${txn.transactionType.name() == 'WITHDRAW'} ? 'bg-danger' : 'bg-warning text-dark')" th:text="${txn.transactionType}">Type</span>
+                                    </td>
+                                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; letter-spacing: 1px;">
+                                        <span th:if="${txn.fromAccount != null}" th:text="${txn.fromAccount.accountNumber}">From</span>
+                                        <span th:unless="${txn.fromAccount != null}" class="text-muted">-</span>
+                                    </td>
+                                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; letter-spacing: 1px;">
+                                        <span th:if="${txn.toAccount != null}" th:text="${txn.toAccount.accountNumber}">To</span>
+                                        <span th:unless="${txn.toAccount != null}" class="text-muted">-</span>
+                                    </td>
+                                    <td>
+                                        <span th:class="${txn.transactionType.name() == 'DEPOSIT' or (txn.transactionType.name() == 'TRANSFER' and txn.toAccount != null and userAccountNumbers.contains(txn.toAccount.accountNumber))} ? 'txn-credit' : 'txn-debit'"
+                                              th:text="(${txn.transactionType.name() == 'DEPOSIT' or (txn.transactionType.name() == 'TRANSFER' and txn.toAccount != null and userAccountNumbers.contains(txn.toAccount.accountNumber))} ? '+' : '-') + '$' + ${#numbers.formatDecimal(txn.amount, 1, 2)}">
+                                            $0.00
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-luxe" th:classappend="${txn.status.name() == 'SUCCESS'} ? 'bg-success' : 'bg-danger'" th:text="${txn.status}">Status</span>
+                                    </td>
+                                    <td style="font-size: 0.9rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${txn.description}">Desc</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-luxe text-center mt-4">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Aegis Capital. All rights reserved.</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
